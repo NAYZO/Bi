@@ -9,5 +9,16 @@ package bi;
  * @author Hamza
  */
 public class Timer {
+    private long timeBench;
+    
+    public void startTimer()
+    {
+        this.timeBench = System.currentTimeMillis();        
+    }
+    
+    public void showTimer()
+    {
+        System.out.println("Total execution time: " + (System.currentTimeMillis()-this.timeBench) + " ms");
+    }
     
 }

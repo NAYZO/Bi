@@ -15,9 +15,15 @@ public class Bi {
     public static void main(String[] args) {
         ConnexionBD connexion = new ConnexionBD();
         connexion.openConnectionForMySql(Constante.db_trans);
-        System.out.println("Start");
-        connexion.remplirEtudiant(1);
-        System.out.println("Stop");
+        System.out.println("Start Loading DB");
+        connexion.remplirMySql(1);
+        System.out.println("End Loading");
+        // Benchmarking MySql vs MySql
+        Timer mysqlTime = new Timer();
+        mysqlTime.startTimer();
+        connexion.loadMysqlDwh();
+        mysqlTime.showTimer();
+        
         connexion.closeConnection();
     }
 }

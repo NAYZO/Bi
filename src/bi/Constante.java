@@ -10,6 +10,7 @@ package bi;
  */
 public class Constante {
     
+    // Les Constantes
     public static final String mysql_host = "jdbc:mysql://localhost/";
     public static final String oracle_host = "";
     
@@ -20,8 +21,15 @@ public class Constante {
     public static final String oracle_driver = "";
     
     public static final String mysql_username = "root";
-    public static final String oracle_username = "root";
+    public static final String oracle_username = "";
     
-    public static final String mysql_password = "root";
-    public static final String oracle_password = "root";
+    public static final String mysql_password = "";
+    public static final String oracle_password = "";
+    
+    // Les Fonctions
+    public static int getRandomNumber(int min, int max) {
+        //retourne un entier aléatoire compris entre min et max
+        return (int)(Math.random() * (max - min + 1)) + min;
+    }
+    
 }

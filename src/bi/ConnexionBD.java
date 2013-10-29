@@ -7,12 +7,8 @@ package bi;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-//import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  *
@@ -20,43 +16,38 @@ import java.util.Date;
  */
 public class ConnexionBD {
     
-    private Connection mysql_conn = null;
-    private Connection oracle_conn = null;
-    
-    public boolean openConnectionForMySql(String bd) {
+    public static Connection openConnectionForMySql(String bd) {
         
         if(!bd.equals(Constante.db_trans) && !bd.equals(Constante.db_dwh)) {
             System.out.println("Nom de base de données n'est pas valide");
-            return false;
+            return null;
         }
         
         try {
             Class.forName(Constante.mysql_driver).newInstance();
-            this.mysql_conn = DriverManager.getConnection(Constante.mysql_host + bd, Constante.mysql_username, Constante.mysql_password);
-            return true;
+            return DriverManager.getConnection(Constante.mysql_host + bd, Constante.mysql_username, Constante.mysql_password);
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
             System.out.println(ex.getCause() + ex.getMessage());
-            return false;
+            return null;
         }
     }
     
-    public boolean openConnectionForOracle() {
+    public static Connection openConnectionForOracle(String bd) {
         
-        return true;
+        return null;
     }
     
-    public boolean closeConnection() {
+    public static void openConnectionFromFile(String path) {
+        
+    }
+    
+    public static boolean closeConnection(Connection conn) {
         
         try {
-            if(this.mysql_conn != null) {
-                this.mysql_conn.close();
-            }
-                
-            if(this.oracle_conn != null) {
-                this.oracle_conn.close();
-            }
-            
+            if(conn != null) {
+                conn.close();
+        }
             return true;
         }
         catch (SQLException ex) {
@@ -65,86 +56,93 @@ public class ConnexionBD {
         }
     }
     
-    public void remplirMySql(int nbreLigne) {
+    public static boolean remplirTables(Connection conn, int nbreLigne) {
         
         try {
-            Statement st = this.mysql_conn.createStatement();
-            for(int i=0 ; i<nbreLigne ; i++) {
-                st.executeUpdate("INSERT INTO etudiant VALUES(null, 'walid', 'riahi', '2012/12/12', "+this.getRandomNote(1,7)+")", Statement.RETURN_GENERATED_KEYS);
-                ResultSet keys = st.getGeneratedKeys();    
-                keys.next();  
-                Integer lastId = keys.getInt(1);
-                st.executeUpdate("INSERT INTO notes VALUES(null, "+this.getRandomNote(0,20)+", "+this.getRandomNote(0,20)+", "+this.getRandomNote(0,20)+", "+lastId+")");
+            if(!conn.getMetaData().getURL().contains(Constante.db_trans)) {
+                System.out.println("Mauvaise base de données selectionnée. Vous devez utiliser la base transcationnelle pour cette fonction");
+                return false;
             }
+            
+            Statement st = conn.createStatement();
+            ResultSet keys;
+            Integer lastId;
+            
+            for(int i=0 ; i<nbreLigne ; i++) {
+                st.executeUpdate("INSERT INTO etudiant VALUES(null, 'Riahi', 'walid', '" + Constante.getRandomNumber(1950, 2000) + "/" + Constante.getRandomNumber(1, 12) + "/" + Constante.getRandomNumber(1, 28) + "', " + Constante.getRandomNumber(1, 7) + ")", Statement.RETURN_GENERATED_KEYS);
+                keys = st.getGeneratedKeys();
+                keys.next();
+                lastId = keys.getInt(1);
+                st.executeUpdate("INSERT INTO notes VALUES(null, " + Constante.getRandomNumber(0,20) + ", " + Constante.getRandomNumber(0,20) + ", " + Constante.getRandomNumber(0,20) + ", " + lastId + ")");
+            }
+            
+            System.out.println("Remplissage terminé avec succès");
+            return true;
         }
         catch (SQLException ex) {
             System.out.println("Erreur: " + ex.getCause() + ex.getMessage());
+            return false;
         }
     }
     
-    public int getRandomNote(int min, int max)
-    {
-        return min + (int)(Math.random() * ((max - min) + 1));
-    }
-    
-    public void loadMysqlDwh()
-    {
+    public static boolean clearEtudiant(Connection conn) {
+        
         try {
-            Statement st = this.mysql_conn.createStatement();
-            String query = "SELECT * FROM etudiant e JOIN branche b ON e.branche_id = b.id JOIN notes n ON e.id = n.etudiant_id";
-            ResultSet rs = st.executeQuery(query);
-            this.openConnectionForMySql(Constante.db_dwh);
-            Statement stdwh = this.mysql_conn.createStatement();
-            while (rs.next()) {
-                // calculer Moyenne
-                Float moy = (rs.getFloat("trimestre1") + rs.getFloat("trimestre2") + rs.getFloat("trimestre3"))/3;                
-                try {
-                    // calculer age
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = new Date();                
-                    long d1=dateFormat.parse(rs.getString("date_naissance")).getTime();
-                    long d2=dateFormat.parse(dateFormat.format(date)).getTime();
-                    int age = (int)Math.abs((d1-d2)/(1000*60*60*24*365));
-                    stdwh.executeUpdate("INSERT INTO etudiant VALUES(null, '"+rs.getString("nom")+"', '"+rs.getString("prenom")+"',"+age+" , '"+rs.getString("branche")+"', "+moy+")");
-                }
-                catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                
-            }  
+            if(!conn.getMetaData().getURL().contains(Constante.db_trans)) {
+                System.out.println("Mauvaise base de données selectionnée. Vous devez utiliser la base transcationnelle pour cette fonction");
+                return false;
+            }
+            
+            Statement st = conn.createStatement();
+            st.executeUpdate("TRUNCATE TABLE etudiant");
+            
+            System.out.println("Table vidé avec succès");
+            return true;
         }
         catch (SQLException ex) {
             System.out.println("Erreur: " + ex.getCause() + ex.getMessage());
+            return false;
         }
     }
-       
-
     
-//    public void test() {
-//        try {
-//            Statement st = this.mysql_conn.createStatement();
-//            ResultSet obj = st.executeQuery("SELECT * FROM branche;");
-//            ResultSetMetaData resultMeta = obj.getMetaData();
-//            
-//            System.out.println("\n**********************************");
-//            //On affiche le nom des colonnes
-//            for(int i = 1; i <= resultMeta.getColumnCount(); i++) {
-//                System.out.print("\t" + resultMeta.getColumnName(i).toUpperCase() + "\t *");
-//            }
-//
-//            System.out.println("\n**********************************");
-//
-//            while(obj.next()){         
-//              for(int i = 1; i <= resultMeta.getColumnCount(); i++) {
-//                    System.out.print("\t" + obj.getObject(i).toString() + "\t |");
-//                }
-//
-//              System.out.println("\n---------------------------------");
-//            }
-//        }
-//        catch (SQLException ex) {
-//            System.out.println(ex.getCause() + ex.getMessage());
-//        }
-//    }
+    public static boolean clearNotes(Connection conn) {
+        
+        try {
+            if(!conn.getMetaData().getURL().contains(Constante.db_trans)) {
+                System.out.println("Mauvaise base de données selectionnée. Vous devez utiliser la base transcationnelle pour cette fonction");
+                return false;
+            }
+            
+            Statement st = conn.createStatement();
+            st.executeUpdate("TRUNCATE TABLE notes");
+            
+            System.out.println("Table vidé avec succès");
+            return true;
+        }
+        catch (SQLException ex) {
+            System.out.println("Erreur: " + ex.getCause() + ex.getMessage());
+            return false;
+        }
+    }
+    
+    public static boolean clearDWH(Connection conn) {
+        
+        try {
+            if(!conn.getMetaData().getURL().contains(Constante.db_dwh)) {
+                System.out.println("Mauvaise base de données selectionnée. Vous devez utiliser la base DWH pour cette fonction");
+                return false;
+            }
+            
+            Statement st = conn.createStatement();
+            st.executeUpdate("TRUNCATE TABLE etudiant");
+            
+            System.out.println("Table vidé avec succès");
+            return true;
+        }
+        catch (SQLException ex) {
+            System.out.println("Erreur: " + ex.getCause() + ex.getMessage());
+            return false;
+        }
+    }
     
 }

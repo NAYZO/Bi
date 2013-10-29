@@ -3,6 +3,9 @@
  * and open the template in the editor.
  */
 package bi;
+
+import java.sql.Connection;
+
 /**
  *
  * @author nayzo
@@ -13,17 +16,32 @@ public class Bi {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        ConnexionBD connexion = new ConnexionBD();
-        connexion.openConnectionForMySql(Constante.db_trans);
-        System.out.println("Start Loading DB");
-        connexion.remplirMySql(1);
-        System.out.println("End Loading");
-        // Benchmarking MySql vs MySql
-        Timer mysqlTime = new Timer();
-        mysqlTime.startTimer();
-        connexion.loadMysqlDwh();
-        mysqlTime.showTimer();
         
-        connexion.closeConnection();
+        // Initialisation du Timer
+        Timer timer = new Timer();
+        timer.startTimer();
+        
+        // Ouverture des connexion
+        Connection conn1 = ConnexionBD.openConnectionForMySql(Constante.db_trans);
+        Connection conn2 = ConnexionBD.openConnectionForMySql(Constante.db_dwh);
+        
+        // Clearing all tables
+        ConnexionBD.clearEtudiant(conn1);
+        ConnexionBD.clearNotes(conn1);
+        ConnexionBD.clearDWH(conn2);
+        
+        // Remplissage des tables de la base transactionnelle
+        ConnexionBD.remplirTables(conn1, 20);
+        
+        // Transformation des données et remplissage de la base DWH
+        Traitement tr = new Traitement(conn1, conn2);
+        tr.transform();
+        
+        // Fermeture des connexion
+        ConnexionBD.closeConnection(conn1);
+        ConnexionBD.closeConnection(conn2);
+        
+        // Affichage du temps d'execution
+        timer.showTimer();
     }
 }

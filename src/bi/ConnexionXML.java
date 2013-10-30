@@ -85,7 +85,7 @@ public class ConnexionXML {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(new File("file.xml"));
+		StreamResult result = new StreamResult(new File("BDtransactionnelle.xml"));
  
 		transformer.transform(source, result);
  

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BDtransactionnelle>
+    <etudiant>
+        <etnd id="1" nom="Riahi" prenom="Walid" date_naissance="12/03/1980" branche_id="1" />
+        <etnd id="2" nom="Riahi" prenom="Walid" date_naissance="12/03/1980" branche_id="2" />
+        <etnd id="3" nom="Riahi" prenom="Walid" date_naissance="12/03/1980" branche_id="1" />
+        <etnd id="4" nom="Riahi" prenom="Walid" date_naissance="12/03/1980" branche_id="2" />
+    </etudiant>
+    <notes>
+        <nt id="1" trimestre1="10" trimestre2="14" trimestre3="9" etudiant_id="1" />
+        <nt id="2" trimestre1="10" trimestre2="14" trimestre3="9" etudiant_id="2" />
+        <nt id="3" trimestre1="10" trimestre2="14" trimestre3="9" etudiant_id="3" />
+        <nt id="4" trimestre1="10" trimestre2="14" trimestre3="9" etudiant_id="4" />
+    </notes>
+    <branche>
+        <bre id="1" branche="mathemathique" />
+        <bre id="2" branche="informatique" />
+    </branche>
+</BDtransactionnelle>

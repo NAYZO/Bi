@@ -17,6 +17,10 @@ public class Bi {
      */
     public static void main(String[] args) {
         
+        //remplire le XML
+        ConnexionXML connexionxml = new ConnexionXML();
+        connexionxml.writeIntoXML(7);        
+        
         // Ouverture des connexion
         Connection conn1 = ConnexionBD.openConnectionForMySql(Constante.db_trans);
         Connection conn2 = ConnexionBD.openConnectionForMySql(Constante.db_dwh);

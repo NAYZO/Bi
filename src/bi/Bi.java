@@ -29,6 +29,9 @@ public class Bi {
         // Remplissage des tables de la base transactionnelle
         ConnexionBD.remplirTables(conn1, 20);
         
+        //remplire Fichier depuis Mysql
+        
+        
         // Initialisation du Timer
         Timer timer = new Timer();
         timer.startTimer();

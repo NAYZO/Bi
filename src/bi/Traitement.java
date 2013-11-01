@@ -108,9 +108,5 @@ public class Traitement {
             return false;
         }
     }
-    
-    public boolean transformFromXMLFile() {
-        return true;
-    }
-    
+
 }

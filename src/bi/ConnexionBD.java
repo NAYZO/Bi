@@ -50,10 +50,6 @@ public class ConnexionBD {
         }
     }
     
-    public static void openConnectionFromXMLFile(String path) {
-        
-    }
-    
     public static boolean closeConnection(Connection conn) {
         
         try {

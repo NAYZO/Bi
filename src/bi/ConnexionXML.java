@@ -36,18 +36,27 @@ public class ConnexionXML {
 		Document doc = docBuilder.newDocument();
 		Element rootElement = doc.createElement("BDtransactionnelle");
 		doc.appendChild(rootElement);
+                
+                // element branche
+                Element branche = doc.createElement("branche");
+                rootElement.appendChild(branche);
  
                 // element etudiant
                 Element etudiant = doc.createElement("etudiant");
                 rootElement.appendChild(etudiant);
                 
-                // element etudiant
+                // element notes
                 Element notes = doc.createElement("notes");
-                rootElement.appendChild(notes);
+                rootElement.appendChild(notes);             
                 
-                // element branche
-                Element branche = doc.createElement("branche");
-                rootElement.appendChild(branche);
+                
+                // element bre
+                    for(int i=1; i<=7; i++) {
+                        Element bre = doc.createElement("bre");   
+                        bre.setAttribute("id", ""+i+"");
+                        bre.setAttribute("branche", ""+brch[i-1]+""); 
+                        branche.appendChild(bre);
+                    }                
 
                     // element etnd
                     for(int i=1; i<=nbreLigne; i++) {
@@ -71,21 +80,14 @@ public class ConnexionXML {
                         nt.setAttribute("trimestre3", ""+Constante.getRandomNumber(0,20)+"");
                         nt.setAttribute("etudiant_id", ""+i+"");
                         notes.appendChild(nt);
-                    }
-                    
-                 // element bre
-                    for(int i=1; i<=7; i++) {
-                        Element bre = doc.createElement("bre");   
-                        bre.setAttribute("id", ""+i+"");
-                        bre.setAttribute("branche", ""+brch[i-1]+""); 
-                        branche.appendChild(bre);
-                    }
+                    }                    
+                 
                         
 		// l'enregistrement dans le fichier XML
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(new File("BDtransactionnelle.xml"));
+		StreamResult result = new StreamResult(new File("src/bi/BDtransactionnelle.xml"));
  
 		transformer.transform(source, result);
  
@@ -98,4 +100,21 @@ public class ConnexionXML {
 	  }
     }
     
+    public void deleteXML() {
+        try{
+ 
+    		File file = new File("src/bi/BDtransactionnelle.xml");
+ 
+    		if(file.delete()){
+    			System.out.println(file.getName() + " est Supprimé avec succès!");
+    		}else{
+    			System.out.println("Suppression échoué!");
+    		}
+ 
+    	}catch(Exception e){
+ 
+    		e.printStackTrace();
+ 
+    	}
+    }
 }

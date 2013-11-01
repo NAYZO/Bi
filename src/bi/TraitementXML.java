@@ -31,16 +31,16 @@ import org.xml.sax.helpers.DefaultHandler;
 public class TraitementXML extends DefaultHandler {
     
     // Definition des variables
-        Map<String, String> etn = new HashMap<String, String>();
-        List<HashMap<String, String>> etudiant = new ArrayList<HashMap<String, String>>();
-        Map<String, String> branche = new HashMap<String, String>();
+        
+        List<HashMap<String, String>> etudiant = new ArrayList<>();
+        Map<String, String> branche = new HashMap<>();
         Statement st_MySql;
         ResultSet rs;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        float moy;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");        
         Date d1;
         Calendar cal;
         int age=0;
+        float moy;
         
     private Connection conn_MySql;    
     
@@ -50,7 +50,7 @@ public class TraitementXML extends DefaultHandler {
     }
     
 //***********************************************    
-public int getAge(String age) {
+public String getAge(String age) {
       // Calculer age
                 try {
                     d1 = dateFormat.parse(age);
@@ -63,7 +63,7 @@ public int getAge(String age) {
                 catch(ParseException pe) {
                     System.out.println("Erreur parse: " + pe.getCause() + "\n" + pe.getMessage());
                 }
-                return this.age;
+                return Integer.toString(this.age);
   }
 
  public void LoadXML(){
@@ -84,19 +84,24 @@ public int getAge(String age) {
       Attributes attributes) throws SAXException {
    
      if (qName.equalsIgnoreCase("BRE")) {
-         branche.put(""+attributes.getValue("id")+"", attributes.getValue("branche"));
+         
+         int id = Integer.parseInt(attributes.getValue("id"))-1;
+         branche.put(""+id+"", attributes.getValue("branche"));
      }   
-     if (qName.equalsIgnoreCase("ETN")) {
-         etn.put("nom", attributes.getValue("nom"));
-         etn.put("prenom", attributes.getValue("prenom"));
-         etn.put("branche", branche.get(""+attributes.getValue("branche_id")+""));
-         etn.put("age", ""+getAge(attributes.getValue("date_naissance"))+"");
-         etudiant.add( Integer.parseInt(attributes.getValue("id")), (HashMap<String, String>) etn);
+     if (qName.equalsIgnoreCase("ETND")) {
+         Map<String, String> etnd = new HashMap<>();
+         etnd.put("nom", attributes.getValue("nom"));
+         etnd.put("prenom", attributes.getValue("prenom"));
+         int id = Integer.parseInt(attributes.getValue("branche_id"))-1;
+         etnd.put("branche", branche.get(""+id+""));
+         etnd.put("age", getAge(attributes.getValue("date_naissance")) );                 
+         etudiant.add( Integer.parseInt(attributes.getValue("id"))-1, (HashMap<String, String>) etnd);
      }
      if (qName.equalsIgnoreCase("NT")) {
          
          moy = ((Float.parseFloat(attributes.getValue("trimestre1")) + Float.parseFloat(attributes.getValue("trimestre2")) + Float.parseFloat(attributes.getValue("trimestre3")))/3);
-         etudiant.get(Integer.parseInt(attributes.getValue("etudiant_id"))).put("moyenne", ""+moy+"");
+         int id = Integer.parseInt(attributes.getValue("etudiant_id"))-1;
+         etudiant.get(id).put("moyenne", ""+moy+"");
      }     
     }
 
@@ -135,8 +140,7 @@ public int getAge(String age) {
             st_MySql = this.conn_MySql.createStatement();
             
             // Parcours du resultat de la requete
-            for(int i=1; i<=etudiant.size(); i++) {        
-                
+            for(int i=0; i<=etudiant.size()-1; i++) {        
                 // Insertion
                     st_MySql.executeUpdate("INSERT INTO etudiant VALUES(null, '" + etudiant.get(i).get("nom") + "', '" + etudiant.get(i).get("prenom") + "', " + etudiant.get(i).get("age") + ", '" + etudiant.get(i).get("branche") + "', " + etudiant.get(i).get("moyenne") + ")");
             }

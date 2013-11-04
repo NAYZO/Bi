@@ -13,57 +13,41 @@ import java.sql.Connection;
 public class Bi {
 
     /**
-     * @param args the command line arguments
+     *
+    public s @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        // Ouverture des connexion
-        Connection db_trans = ConnexionBD.openConnectionForMySql(Constante.db_trans);
-        Connection db_dwh = ConnexionBD.openConnectionForMySql(Constante.db_dwh);
         
-        // Clearing all tables
-        ConnexionBD.clearEtudiant(db_trans);
-        ConnexionBD.clearNotes(db_trans);
-        ConnexionBD.clearDWH(db_dwh);
+        ConnexionXML.deleteXML();
+        ConnexionXML.writeIntoXML(5);
         
-// ############################ FICHIER XML ######################################        
-        //remplire le XML
-        ConnexionXML connexionxml = new ConnexionXML();
-        connexionxml.deleteXML();
-        connexionxml.writeIntoXML(7);        
+        Connection conn = ConnexionBD.openConnectionForOracle(Constante.db_dwh);
+        ConnexionBD.clearDWH(conn);
         
-        // Initialisation du Timer
-        Timer timer1 = new Timer();
-        timer1.startTimer();
+        TraitementXML trxml = new TraitementXML(conn);
+        trxml.transformXML();
         
-        // Traitement sur XML
-        TraitementXML traitementxml = new TraitementXML(db_dwh);
-        traitementxml.LoadXML();
-        traitementxml.transformXML();
+        ConnexionBD.closeConnection(conn);
         
-        // Affichage du temps d'execution
-        timer1.showTimer();
-
- // ############################ MySql -> MySql ######################################
- 
-   /*     
-        // Remplissage des tables de la base transactionnelle
-        ConnexionBD.remplirTables(db_trans, 20);
-
-        // Initialisation du Timer
-        Timer timer2 = new Timer();
-        timer2.startTimer();
+        /*
+        // Ouverture des connexions
+        Connection conn_trans = ConnexionBD.openConnectionForMySql(Constante.db_trans);
+        Connection conn_dwh   = ConnexionBD.openConnectionForOracle(Constante.db_dwh);
         
-        // Transformation des données et remplissage de la base DWH
-        Traitement tr = new Traitement(db_trans, db_dwh);
+        // Clearing tables
+        ConnexionBD.clearEtudiant(conn_trans);
+        ConnexionBD.clearNotes(conn_trans);
+        ConnexionBD.clearDWH(conn_dwh);
+        
+        // Remplissage des tables
+        ConnexionBD.remplirTables(conn_trans, 10);
+        
+        // Traitement
+        Traitement tr = new Traitement(conn_trans, conn_dwh);
         tr.transform();
         
-        // Affichage du temps d'execution
-        timer2.showTimer();
-        
-        // Fermeture des connexion
-        ConnexionBD.closeConnection(db_trans);
-        ConnexionBD.closeConnection(db_dwh);        
-    */   
+        // Fermeture des connexions
+        ConnexionBD.closeConnection(conn_trans);
+        ConnexionBD.closeConnection(conn_dwh);*/
     }
 }

@@ -21,10 +21,10 @@ public class Constante {
     public static final String oracle_driver = "oracle.jdbc.driver.OracleDriver";
     
     public static final String mysql_username = "root";
-    public static final String oracle_username = "root";
+    public static final String oracle_username = "";
     
-    public static final String mysql_password = "root";
-    public static final String oracle_password = "root";
+    public static final String mysql_password = "";
+    public static final String oracle_password = "test";
     
     // Les Fonctions
     public static int getRandomNumber(int min, int max) {

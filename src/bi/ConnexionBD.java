@@ -25,7 +25,9 @@ public class ConnexionBD {
         
         try {
             Class.forName(Constante.mysql_driver).newInstance();
-            return DriverManager.getConnection(Constante.mysql_host + bd, Constante.mysql_username, Constante.mysql_password);
+            Connection conn = DriverManager.getConnection(Constante.mysql_host + bd, Constante.mysql_username, Constante.mysql_password);
+            System.out.println("Connexion établie");
+            return conn;
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
             System.out.println("Erreur: " + ex.getCause() + "\n" + ex.getMessage());
@@ -42,7 +44,9 @@ public class ConnexionBD {
         
         try {
             Class.forName(Constante.oracle_driver).newInstance();
-            return DriverManager.getConnection(Constante.oracle_host, bd, Constante.oracle_password);
+            Connection conn = DriverManager.getConnection(Constante.oracle_host, bd, Constante.oracle_password);
+            System.out.println("Connexion établie");
+            return conn;
         }
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
             System.out.println("Erreur: " + ex.getCause() + "\n" + ex.getMessage() + "\nClass: " + ex.getClass());
@@ -55,6 +59,7 @@ public class ConnexionBD {
         try {
             if(conn != null) {
                 conn.close();
+                System.out.println("Connexion fermée");
             }
             return true;
         }
@@ -112,14 +117,14 @@ public class ConnexionBD {
                 Statement st = conn.createStatement();
                 st.executeUpdate("TRUNCATE TABLE etudiant");
 
-                System.out.println("Table vidé avec succès");
+                System.out.println("Table vidée avec succès");
                 return true;
             }
             else if(conn.getMetaData().getUserName().equals(Constante.db_trans.toUpperCase())) { //Base de données = Oracle
                 Statement st = conn.createStatement();
                 st.executeUpdate("TRUNCATE TABLE \"etudiant\"");
 
-                System.out.println("Table vidé avec succès");
+                System.out.println("Table vidée avec succès");
                 return true;
             }
             else {
@@ -140,14 +145,14 @@ public class ConnexionBD {
                 Statement st = conn.createStatement();
                 st.executeUpdate("TRUNCATE TABLE notes");
 
-                System.out.println("Table vidé avec succès");
+                System.out.println("Table vidée avec succès");
                 return true;
             }
             else if(conn.getMetaData().getUserName().equals(Constante.db_trans.toUpperCase())) { //Base de données = Oracle
                 Statement st = conn.createStatement();
                 st.executeUpdate("TRUNCATE TABLE \"notes\"");
 
-                System.out.println("Table vidé avec succès");
+                System.out.println("Table vidée avec succès");
                 return true;
             }
             else {
@@ -175,7 +180,7 @@ public class ConnexionBD {
                 Statement st = conn.createStatement();
                 st.executeUpdate("TRUNCATE TABLE \"etudiant\"");
 
-                System.out.println("Table vidé avec succès");
+                System.out.println("Table vidée avec succès");
                 return true;
             }
             else {
